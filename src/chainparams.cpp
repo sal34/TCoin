@@ -187,8 +187,8 @@ public:
         consensus.hashGenesisBlock = genesis.GetX16RHash();
 
         // Genesis block mined for TuriCoin mainnet
-        assert(consensus.hashGenesisBlock == uint256S("0x07473470b091eda188fe47dc9dbf6e8e25e417c924892c61f88a0332c70021e9"));
-        assert(genesis.hashMerkleRoot == uint256S("0x28ff00a867739a352523808d301f504bc4547699398d70faf2266a8bae5f3516"));
+        assert(consensus.hashGenesisBlock == uint256S("0xee780b33c993fefc57c2aea94cf7c7bdd0568a49a38a0d2c3e4acccbc401deb0"));
+        assert(genesis.hashMerkleRoot == uint256S("0x4f23f0a5a92732dba008d89980f1711a6333c0865927e23a830d0553f9e07a5e"));
 
         // No seeds initially - will be added after network launch
         // vSeeds.emplace_back("seed1.turicoin.org", false);
@@ -400,8 +400,8 @@ public:
         consensus.hashGenesisBlock = genesis.GetX16RHash();
 
         // Genesis block mined for TuriCoin testnet
-        assert(consensus.hashGenesisBlock == uint256S("0x388251282eea8eb09c9e5a3b82e455e60cf8b775a034908bc6e0ea2cf021a136"));
-        assert(genesis.hashMerkleRoot == uint256S("0x28ff00a867739a352523808d301f504bc4547699398d70faf2266a8bae5f3516"));
+        assert(consensus.hashGenesisBlock == uint256S("0x1b50fee60f3223cb5d7d8e2ab061dd2a8eee48084b954af9b2a58fdb03dd9cc2"));
+        assert(genesis.hashMerkleRoot == uint256S("0x4f23f0a5a92732dba008d89980f1711a6333c0865927e23a830d0553f9e07a5e"));
 
         vFixedSeeds.clear();
         vSeeds.clear();
@@ -616,8 +616,9 @@ public:
         genesis = CreateGenesisBlock(1524179366, 1, 0x207fffff, 4, 5000 * COIN);
         consensus.hashGenesisBlock = genesis.GetX16RHash();
 
-        assert(consensus.hashGenesisBlock == uint256S("0x0b2c703dc93bb63a36c4e33b85be4855ddbca2ac951a7a0a29b8de0408200a3c "));
-        assert(genesis.hashMerkleRoot == uint256S("0x28ff00a867739a352523808d301f504bc4547699398d70faf2266a8bae5f3516"));
+        // Genesis block mined for TuriCoin regtest
+        assert(consensus.hashGenesisBlock == uint256S("0x2d2486dafad725d26e6184742cff9f13f60411ed39908e90537f9e5d79f5cbc0"));
+        assert(genesis.hashMerkleRoot == uint256S("0x4f23f0a5a92732dba008d89980f1711a6333c0865927e23a830d0553f9e07a5e"));
 
         vFixedSeeds.clear(); //!< Regtest mode doesn't have any fixed seeds.
         vSeeds.clear();      //!< Regtest mode doesn't have any DNS seeds.
