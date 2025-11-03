@@ -1,6 +1,7 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2016 The Bitcoin Core developers
 // Copyright (c) 2017-2020 The Raven Core developers
+// Copyright (c) 2024 The TuriCoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -14,6 +15,55 @@
 #include "validation.h"
 #include "chainparams.h"
 #include "tinyformat.h"
+
+// TuriCoin Heartbeat Algorithm - ensures consistent block production
+unsigned int static HeartbeatAlgorithm(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params& params) {
+    assert(pindexLast != nullptr);
+    
+    const arith_uint256 bnPowLimit = UintToArith256(params.powLimit);
+    
+    // For the first few blocks, use minimum difficulty
+    if (!pindexLast || pindexLast->nHeight < params.DifficultyAdjustmentInterval()) {
+        return bnPowLimit.GetCompact();
+    }
+    
+    // Get the last difficulty adjustment interval blocks
+    int64_t nTargetSpacing = params.nPowTargetSpacing;
+    int64_t nInterval = params.DifficultyAdjustmentInterval();
+    
+    // Calculate the actual time taken for the last interval
+    const CBlockIndex* pindexFirst = pindexLast->GetAncestor(pindexLast->nHeight - nInterval + 1);
+    assert(pindexFirst);
+    
+    int64_t nActualTimespan = pindexLast->GetBlockTime() - pindexFirst->GetBlockTime();
+    int64_t nTargetTimespan = nInterval * nTargetSpacing;
+    
+    // Heartbeat mechanism: more responsive difficulty adjustment
+    // Limit adjustment to prevent wild swings but allow faster response
+    if (nActualTimespan < nTargetTimespan / 2)
+        nActualTimespan = nTargetTimespan / 2;
+    if (nActualTimespan > nTargetTimespan * 2)
+        nActualTimespan = nTargetTimespan * 2;
+    
+    // Calculate new target
+    arith_uint256 bnNew;
+    bnNew.SetCompact(pindexLast->nBits);
+    bnNew *= nActualTimespan;
+    bnNew /= nTargetTimespan;
+    
+    // Apply exponential moving average for smoother transitions (heartbeat effect)
+    arith_uint256 bnOld;
+    bnOld.SetCompact(pindexLast->nBits);
+    
+    // 75% new difficulty, 25% old difficulty for smooth transitions
+    bnNew = (bnNew * 3 + bnOld) / 4;
+    
+    if (bnNew > bnPowLimit) {
+        bnNew = bnPowLimit;
+    }
+    
+    return bnNew.GetCompact();
+}
 
 unsigned int static DarkGravityWave(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params& params) {
     /* current difficulty formula, dash - DarkGravity v3, written by Evan Duffield - evan@dash.org */
@@ -139,19 +189,18 @@ unsigned int GetNextWorkRequiredBTC(const CBlockIndex* pindexLast, const CBlockH
 
 unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params& params)
 {
-//    int64_t nPrevBlockTime = (pindexLast->pprev ? pindexLast->pprev->GetBlockTime() : pindexLast->GetBlockTime());  //<- Commented out - fixes "not used" warning
-
-    if (IsDGWActive(pindexLast->nHeight + 1)) {
-//        LogPrint(BCLog::NET, "Block %s - version: %s: found next work required using DGW: [%s] (BTC would have been [%s]\t(%+d)\t(%0.3f%%)\t(%s sec))\n",
-//                 pindexLast->nHeight + 1, pblock->nVersion, dgw, btc, btc - dgw, (float)(btc - dgw) * 100.0 / (float)dgw, pindexLast->GetBlockTime() - nPrevBlockTime);
+    // TuriCoin uses Heartbeat algorithm for consistent block production
+    // Use heartbeat algorithm for blocks after height 100 to allow initial network stabilization
+    if (pindexLast && pindexLast->nHeight >= 100) {
+        return HeartbeatAlgorithm(pindexLast, pblock, params);
+    }
+    // For early blocks, use DGW if active, otherwise BTC algorithm
+    else if (IsDGWActive(pindexLast->nHeight + 1)) {
         return DarkGravityWave(pindexLast, pblock, params);
     }
     else {
-//        LogPrint(BCLog::NET, "Block %s - version: %s: found next work required using BTC: [%s] (DGW would have been [%s]\t(%+d)\t(%0.3f%%)\t(%s sec))\n",
-//                  pindexLast->nHeight + 1, pblock->nVersion, btc, dgw, dgw - btc, (float)(dgw - btc) * 100.0 / (float)btc, pindexLast->GetBlockTime() - nPrevBlockTime);
         return GetNextWorkRequiredBTC(pindexLast, pblock, params);
     }
-
 }
 
 unsigned int CalculateNextWorkRequired(const CBlockIndex* pindexLast, int64_t nFirstBlockTime, const Consensus::Params& params)

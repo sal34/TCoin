@@ -1,18 +1,18 @@
-Raven Core integration/staging tree
+TuriCoin Core integration/staging tree
 =====================================
 
-https://ravencoin.org
+https://turicoin.org
 
-To see how to run Ravencoin, please read the respective files in [the doc folder](doc)
+To see how to run TuriCoin, please read the respective files in [the doc folder](doc)
 
 
-What is Ravencoin?
+What is TuriCoin?
 ----------------
 
-Ravencoin is an experimental digital currency that enables instant payments to
-anyone, anywhere in the world. The Ravencoin platform also lets anyone create assets (tokens) on the Ravencoin network. 
+TuriCoin is an experimental digital currency that enables instant payments to
+anyone, anywhere in the world. The TuriCoin platform also lets anyone create assets (tokens) on the TuriCoin network. 
 Assets can be used for NFTs, STOs, Gift Cards, and fractional ownership of anything of value.
-Ravencoin uses peer-to-peer technology to operate
+TuriCoin uses peer-to-peer technology to operate
 with no central authority: managing transactions and issuing money are carried
 out collectively by the network. 
 
@@ -21,15 +21,15 @@ out collectively by the network.
 License
 -------
 
-Raven Core is released under the terms of the MIT license. See [COPYING](COPYING) for more
+TuriCoin Core is released under the terms of the MIT license. See [COPYING](COPYING) for more
 information or see https://opensource.org/licenses/MIT.
 
 Development Process
 -------------------
 
 The `master` branch is regularly built and tested, but is not guaranteed to be
-completely stable. [Tags](https://github.com/RavenProject/Ravencoin/tags) are created
-regularly to indicate new official, stable release versions of Raven Core.
+completely stable. [Tags](https://github.com/TuriCoinProject/TuriCoin/tags) are created
+regularly to indicate new official, stable release versions of TuriCoin Core.
 
 Active development is done in the `develop` branch. 
 
